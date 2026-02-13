@@ -1,0 +1,19 @@
+name: CD - Deploy Server (Runner)
+
+on:
+  workflow_run:
+    workflows: ["CI - Test HTML"]
+    types: [completed]
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy index.html to nginx docroot
+        run: |
+          cp index.html /opt/homebrew/var/www/index.html
+          brew services restart nginx
